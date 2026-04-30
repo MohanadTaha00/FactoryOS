@@ -1,0 +1,59 @@
+name: factoryos
+description: "FactoryOS - Cross-platform Industrial Workflow & Inventory Management System"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # Backend
+  supabase_flutter: ^2.12.4
+
+  # State management
+  flutter_riverpod: ^3.3.1
+
+  # Routing
+  go_router: ^17.2.2
+
+  # Local persistence (offline cache)
+  drift: ^2.32.1
+  drift_flutter: ^0.3.0
+  sqlite3_flutter_libs: ^0.6.0
+  path_provider: ^2.1.5
+  path: ^1.9.1
+
+  # Connectivity / sync
+  connectivity_plus: ^7.1.1
+
+  # Reports
+  pdf: ^3.12.0
+  printing: ^5.14.3
+
+  # Utils
+  intl: ^0.20.2
+  uuid: ^4.5.3
+  collection: ^1.19.1
+  equatable: ^2.0.8
+  logger: ^2.7.0
+
+  # Notifications
+  flutter_local_notifications: ^21.0.0
+  file_picker: ^10.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.14.1
+  drift_dev: ^2.32.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/

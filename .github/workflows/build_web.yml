@@ -1,0 +1,33 @@
+# Builds the Flutter web bundle on every push (no secrets in the repo).
+# Add repository secrets SUPABASE_URL and SUPABASE_ANON_KEY in GitHub:
+# Settings → Secrets and variables → Actions
+name: Build web
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter config --enable-web
+      - run: flutter pub get
+      - run: |
+          flutter build web --release \
+            --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
+            --dart-define=SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: build/web
