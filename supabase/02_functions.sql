@@ -75,13 +75,16 @@ begin
     values (v_wo.qa_assigned_to, p_id, 'Task ready for QA', v_wo.code || ' - ' || v_wo.title, 'ready_for_qa');
   end if;
 
-  if p_to = 'rejected' and v_wo.assigned_to is not null then
-    insert into public.notifications(recipient_id, work_order_id, title, body, kind)
-    values (v_wo.assigned_to, p_id, 'QA rejected your task', v_wo.code || ' needs revisions', 'rejected');
-    -- per the report: rejection automatically reverts to in_progress
+  -- QA rejection must always return the order to the worker as in_progress (not left on
+  -- 'rejected'). Notify the assignee only when one exists.
+  if p_to = 'rejected' then
     update public.work_orders set status = 'in_progress' where id = p_id returning * into v_wo;
     insert into public.work_order_events(work_order_id, actor_id, from_status, to_status, message)
     values (p_id, v_actor, 'rejected', 'in_progress', 'auto-revert after QA rejection');
+    if v_wo.assigned_to is not null then
+      insert into public.notifications(recipient_id, work_order_id, title, body, kind)
+      values (v_wo.assigned_to, p_id, 'QA rejected your task', v_wo.code || ' needs revisions', 'rejected');
+    end if;
   end if;
 
   if p_to = 'approved' and v_wo.created_by is not null then

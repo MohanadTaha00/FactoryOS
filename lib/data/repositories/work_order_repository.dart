@@ -111,33 +111,47 @@ class WorkOrderRepository {
     }
   }
 
+  /// Orders this QA has recorded an inspection for (see [quality_logs]).
+  /// After a fail, the work order returns to `in_progress`, so we key off logs
+  /// rather than `status = rejected`.
   Future<List<WorkOrder>> fetchQaHistory(String userId) async {
     try {
+      final logRows = await _c
+          .from('quality_logs')
+          .select('work_order_id')
+          .eq('inspector_id', userId);
+      final list = (logRows as List).cast<Map<String, dynamic>>();
+      final ids =
+          list.map((e) => e['work_order_id'] as String).toSet().toList();
+      if (ids.isEmpty) return [];
       final rows = await _c
           .from('work_orders')
           .select(_selectColumns)
-          .eq('qa_assigned_to', userId)
-          .inFilter('status', [
-            'approved',
-            'completed',
-            'rejected',
-            'cancelled',
-          ])
+          .inFilter('id', ids)
           .order('updated_at', ascending: false);
-      final list = (rows as List).cast<Map<String, dynamic>>();
-      return list.map(WorkOrder.fromMap).toList();
+      final orders = ((rows as List).cast<Map<String, dynamic>>())
+          .map(WorkOrder.fromMap)
+          .toList();
+      await _cacheOrders(orders);
+      return orders;
     } catch (_) {
       final cached = await _readFromCache();
-      return cached
+      final result = cached
           .where(
             (w) =>
                 w.qaAssignedTo == userId &&
                 (w.status == WorkOrderStatus.approved ||
                     w.status == WorkOrderStatus.completed ||
                     w.status == WorkOrderStatus.rejected ||
-                    w.status == WorkOrderStatus.cancelled),
+                    w.status == WorkOrderStatus.cancelled ||
+                    w.status == WorkOrderStatus.inProgress),
           )
           .toList();
+      result.sort(
+        (a, b) => (b.updatedAt ?? b.createdAt)
+            .compareTo(a.updatedAt ?? a.createdAt),
+      );
+      return result;
     }
   }
 
