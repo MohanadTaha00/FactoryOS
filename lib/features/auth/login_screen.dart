@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../state/providers.dart';
 
@@ -41,11 +42,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         // currentProfileProvider resolves.
         await ref.read(currentProfileProvider.future);
       }
-    } catch (e) {
-      setState(() => _error = 'One of entered information is incorrect');
+    } on AuthException catch (e) {
+      setState(() => _error = _friendlyAuthError(e));
+    } catch (_) {
+      setState(
+        () => _error =
+            'Sign-in failed. Check internet, Supabase config, and credentials.',
+      );
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  String _friendlyAuthError(AuthException e) {
+    final msg = e.message.toLowerCase();
+    if (msg.contains('invalid login credentials')) {
+      return 'Invalid email or password.';
+    }
+    if (msg.contains('email not confirmed')) {
+      return 'Email not confirmed. Disable email confirmation in Supabase or confirm this account.';
+    }
+    if (msg.contains('too many requests')) {
+      return 'Too many login attempts. Please wait and try again.';
+    }
+    return e.message;
   }
 
   @override

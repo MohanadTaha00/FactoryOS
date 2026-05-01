@@ -21,7 +21,10 @@ class AuthRepository {
     required String email,
     required String password,
   }) =>
-      _client.auth.signInWithPassword(email: email.trim(), password: password);
+      _client.auth.signInWithPassword(
+        email: email.trim().toLowerCase(),
+        password: password,
+      );
 
   Future<AuthResponse> signUp({
     required String email,
