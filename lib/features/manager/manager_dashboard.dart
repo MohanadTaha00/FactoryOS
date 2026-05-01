@@ -22,9 +22,14 @@ class ManagerDashboard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(currentProfileProvider).value;
+    final isAdmin = profile?.role == UserRole.admin;
+    final title = isAdmin ? 'Administrator' : 'Manager';
+    final role = profile?.role ?? UserRole.manager;
+
     return AppScaffold(
-      title: 'Manager',
-      role: UserRole.manager,
+      title: title,
+      role: role,
       destinations: _destinations,
       selectedIndex: 0,
       onDestinationSelected: (i) {
@@ -57,11 +62,22 @@ class _ManagerHome extends ConsumerWidget {
     final ordersAsync = ref.watch(allWorkOrdersProvider);
     final lowStockAsync = ref.watch(lowStockProvider);
 
+    Future<void> reloadOverview() async {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Refreshing data…'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+      await refreshAppData(ref);
+      await ref.read(allWorkOrdersProvider.future);
+      await ref.read(lowStockProvider.future);
+    }
+
     return RefreshIndicator(
-      onRefresh: () async {
-        await refreshAppData(ref);
-        await ref.read(allWorkOrdersProvider.future);
-      },
+      onRefresh: reloadOverview,
       child: ordersAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
@@ -83,6 +99,7 @@ class _ManagerHome extends ConsumerWidget {
           final lowStock = lowStockAsync.value ?? const [];
 
           return ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.all(20),
             children: [
               DashboardHero(
@@ -90,10 +107,23 @@ class _ManagerHome extends ConsumerWidget {
                 subtitle:
                     'Track production flow, inventory risk, and QA throughput.',
                 icon: Icons.dashboard_customize_outlined,
-                trailing: FilledButton.tonalIcon(
-                  onPressed: () => context.push('/manager/orders/new'),
-                  icon: const Icon(Icons.add),
-                  label: const Text('New'),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      tooltip: 'Refresh data',
+                      style: IconButton.styleFrom(
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: reloadOverview,
+                      icon: const Icon(Icons.refresh),
+                    ),
+                    FilledButton.tonalIcon(
+                      onPressed: () => context.push('/manager/orders/new'),
+                      icon: const Icon(Icons.add),
+                      label: const Text('New'),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 16),
