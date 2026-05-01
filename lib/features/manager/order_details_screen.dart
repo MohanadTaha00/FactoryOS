@@ -10,6 +10,7 @@ import '../../data/models/work_order.dart';
 import '../../state/providers.dart';
 import '../reports/report_generator.dart';
 import '../shared/widgets/status_chip.dart';
+import '../shared/widgets/work_order_pdf_attachment.dart';
 
 final _df = DateFormat('MMM d, yyyy HH:mm');
 
@@ -108,27 +109,10 @@ class _OrderBody extends ConsumerWidget {
                   const SizedBox(height: 12),
                   Text(order.description!),
                 ],
-                if (order.attachmentUrl != null) ...[
+                if (order.attachmentUrl != null &&
+                    order.attachmentUrl!.trim().isNotEmpty) ...[
                   const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: cs.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.picture_as_pdf_outlined),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Attachment added to this order.',
-                            style: TextStyle(color: cs.onSurfaceVariant),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  WorkOrderPdfAttachment(url: order.attachmentUrl!),
                 ],
                 const Divider(height: 32),
                 _kv('Created by', order.createdByName ?? '—'),

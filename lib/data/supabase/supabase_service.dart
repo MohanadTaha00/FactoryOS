@@ -19,6 +19,8 @@ class SupabaseService {
       debug: false,
       authOptions: const FlutterAuthClientOptions(
         authFlowType: AuthFlowType.pkce,
+        // Session only in memory; next cold start requires sign-in again.
+        localStorage: EmptyLocalStorage(),
       ),
       realtimeClientOptions: const RealtimeClientOptions(
         logLevel: RealtimeLogLevel.warn,

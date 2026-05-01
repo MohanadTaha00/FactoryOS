@@ -21,12 +21,14 @@ import '../../features/worker/worker_dashboard.dart';
 import '../../features/worker/worker_history_screen.dart';
 import '../../state/providers.dart';
 import '../config/env.dart';
+import 'app_navigator.dart';
 
 class AppRouter {
   AppRouter(this.ref);
   final Ref ref;
 
   late final GoRouter router = GoRouter(
+    navigatorKey: appRootNavigatorKey,
     initialLocation: '/login',
     debugLogDiagnostics: false,
     refreshListenable: _RouterRefresh(ref),
@@ -81,7 +83,8 @@ class AppRouter {
           ),
           GoRoute(
             path: 'reports',
-            pageBuilder: (context, state) => _page(state, const ReportsScreen()),
+            pageBuilder: (context, state) =>
+                _page(state, const ReportsScreen()),
           ),
         ],
       ),
@@ -154,13 +157,14 @@ class AppRouter {
     if (atAuth) return profile.getDashboardView();
 
     final allowed = switch (profile.role) {
-      UserRole.manager => loc.startsWith('/manager') ||
-          loc.startsWith('/notifications'),
-      UserRole.worker => loc.startsWith('/worker') ||
-          loc.startsWith('/notifications'),
-      UserRole.qa => loc.startsWith('/qa') ||
-          loc.startsWith('/notifications') ||
-          loc.startsWith('/manager/orders/'),
+      UserRole.manager =>
+        loc.startsWith('/manager') || loc.startsWith('/notifications'),
+      UserRole.worker =>
+        loc.startsWith('/worker') || loc.startsWith('/notifications'),
+      UserRole.qa =>
+        loc.startsWith('/qa') ||
+            loc.startsWith('/notifications') ||
+            loc.startsWith('/manager/orders/'),
       UserRole.admin => true,
     };
     if (!allowed) return profile.getDashboardView();

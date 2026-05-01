@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/routing/notification_route.dart';
 import '../../state/providers.dart';
 import 'widgets/empty_state.dart';
 import 'widgets/loading_skeleton.dart';
@@ -37,17 +38,21 @@ class NotificationsScreen extends ConsumerWidget {
         loading: () => const LoadingSkeletonList(itemCount: 7),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (list) {
+          final profile = ref
+              .watch(currentProfileProvider)
+              .when(data: (v) => v, loading: () => null, error: (_, _) => null);
           if (list.isEmpty) {
             return const EmptyState(
               icon: Icons.notifications_none,
               title: 'No notifications yet',
-              message: 'You will see updates from work orders and inventory here.',
+              message:
+                  'You will see updates from work orders and inventory here.',
             );
           }
           return ListView.separated(
             padding: const EdgeInsets.all(16),
             itemCount: list.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            separatorBuilder: (_, _) => const SizedBox(height: 8),
             itemBuilder: (_, i) {
               final n = list[i];
               return Card(
@@ -64,26 +69,38 @@ class NotificationsScreen extends ConsumerWidget {
                   title: Text(
                     n.title,
                     style: TextStyle(
-                      fontWeight: n.isUnread ? FontWeight.w700 : FontWeight.w500,
+                      fontWeight: n.isUnread
+                          ? FontWeight.w700
+                          : FontWeight.w500,
                     ),
                   ),
                   subtitle: n.body == null
                       ? null
-                      : Text(n.body!, maxLines: 2, overflow: TextOverflow.ellipsis),
+                      : Text(
+                          n.body!,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                   trailing: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text(df.format(n.createdAt),
-                          style: TextStyle(
-                              fontSize: 11, color: cs.onSurfaceVariant)),
+                      Text(
+                        df.format(n.createdAt),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: cs.onSurfaceVariant,
+                        ),
+                      ),
                       if (n.isUnread) ...[
                         const SizedBox(height: 4),
                         Container(
                           width: 8,
                           height: 8,
                           decoration: BoxDecoration(
-                              color: cs.primary, shape: BoxShape.circle),
+                            color: cs.primary,
+                            shape: BoxShape.circle,
+                          ),
                         ),
                       ],
                     ],
@@ -92,9 +109,12 @@ class NotificationsScreen extends ConsumerWidget {
                     await ref
                         .read(notificationsRepositoryProvider)
                         .markRead(n.id);
-                    if (n.workOrderId != null && context.mounted) {
-                      context.push('/manager/orders/${n.workOrderId}');
-                    }
+                    if (!context.mounted || profile == null) return;
+                    final route = notificationTargetRoute(
+                      notification: n,
+                      role: profile.role,
+                    );
+                    context.push(route);
                   },
                 ),
               );

@@ -9,8 +9,16 @@ import 'features/shared/notifications/notification_service.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SupabaseService.initialize();
+
+  String? notificationLaunchRoute;
   if (!kIsWeb) {
-    await NotificationService.instance.init();
+    notificationLaunchRoute = await NotificationService.instance
+        .initializeAndConsumeLaunchPayload();
   }
-  runApp(const ProviderScope(child: FactoryOSApp()));
+
+  runApp(
+    ProviderScope(
+      child: FactoryOSApp(notificationLaunchRoute: notificationLaunchRoute),
+    ),
+  );
 }

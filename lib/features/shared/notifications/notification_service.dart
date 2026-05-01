@@ -1,9 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-/// Wraps `flutter_local_notifications` for cross-platform display of in-app
-/// alerts (ready_for_qa, rejected, low_stock, etc.).  No-ops on platforms
-/// where it is unsupported instead of throwing.
+/// Local notifications + navigation when user taps an OS notification.
 class NotificationService {
   NotificationService._();
   static final NotificationService instance = NotificationService._();
@@ -13,40 +11,99 @@ class NotificationService {
 
   bool _initialized = false;
 
-  Future<void> init() async {
-    if (_initialized) return;
-    try {
-      const android = AndroidInitializationSettings('@mipmap/ic_launcher');
-      const init = InitializationSettings(android: android);
-      await _plugin.initialize(settings: init);
+  static const _channelId = 'factoryos_default';
+  static const _channelName = 'FactoryOS';
+
+  /// Called after [MaterialApp.router] mounts so [GoRouter.of] works.
+  static void Function(String location)? onNavigateToRoute;
+
+  /// Payload route when app was opened from a terminated state via notification.
+  static String? pendingLaunchRoute;
+
+  Future<String?> initializeAndConsumeLaunchPayload() async {
+    if (_initialized) return null;
+    if (kIsWeb) {
       _initialized = true;
-    } catch (e) {
-      debugPrint('NotificationService init failed: $e');
+      return null;
     }
+
+    try {
+      await _plugin.initialize(
+        settings: const InitializationSettings(
+          android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+          iOS: DarwinInitializationSettings(),
+        ),
+        onDidReceiveNotificationResponse: _onNotificationResponse,
+      );
+
+      final androidImpl = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+      await androidImpl?.createNotificationChannel(
+        const AndroidNotificationChannel(
+          _channelId,
+          _channelName,
+          importance: Importance.high,
+        ),
+      );
+
+      final launch = await _plugin.getNotificationAppLaunchDetails();
+      if (launch?.didNotificationLaunchApp ?? false) {
+        final payload = launch!.notificationResponse?.payload;
+        if (payload != null && payload.isNotEmpty) {
+          pendingLaunchRoute = payload;
+        }
+      }
+    } catch (e, st) {
+      debugPrint('NotificationService plugin init failed: $e $st');
+    }
+
+    _initialized = true;
+    final pending = pendingLaunchRoute;
+    pendingLaunchRoute = null;
+    return pending;
+  }
+
+  static void _onNotificationResponse(NotificationResponse response) {
+    final payload = response.payload;
+    if (payload == null || payload.isEmpty) return;
+    final navigate = onNavigateToRoute;
+    if (navigate != null) {
+      navigate(payload);
+      return;
+    }
+    pendingLaunchRoute = payload;
   }
 
   Future<void> show({
     required int id,
     required String title,
     String? body,
-    String channelId = 'factoryos_default',
-    String channelName = 'FactoryOS',
+    String? payload,
+    String channelId = _channelId,
+    String channelName = _channelName,
   }) async {
-    if (!_initialized) await init();
+    if (kIsWeb) return;
+    if (!_initialized) await initializeAndConsumeLaunchPayload();
     if (!_initialized) return;
+
     final android = AndroidNotificationDetails(
       channelId,
       channelName,
       importance: Importance.high,
       priority: Priority.high,
     );
-    final details = NotificationDetails(android: android);
+    const ios = DarwinNotificationDetails();
+    final details = NotificationDetails(android: android, iOS: ios);
+
     try {
       await _plugin.show(
         id: id,
         title: title,
         body: body,
         notificationDetails: details,
+        payload: payload,
       );
     } catch (e) {
       debugPrint('NotificationService.show failed: $e');
