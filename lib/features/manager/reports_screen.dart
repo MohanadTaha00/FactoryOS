@@ -5,6 +5,7 @@ import '../../data/models/enums.dart';
 import '../../state/providers.dart';
 import '../reports/report_generator.dart';
 import '../shared/widgets/empty_state.dart';
+import '../shared/widgets/refresh_data_button.dart';
 import '../shared/widgets/status_chip.dart';
 
 class ReportsScreen extends ConsumerWidget {
@@ -17,6 +18,7 @@ class ReportsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Reports'),
         actions: [
+          const RefreshDataButton(),
           ordersAsync.maybeWhen(
             data: (orders) => IconButton(
               tooltip: 'Summary report',

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../state/providers.dart';
 import '../shared/widgets/empty_state.dart';
 import '../shared/widgets/loading_skeleton.dart';
+import '../shared/widgets/refresh_data_button.dart';
 import '../shared/widgets/work_order_tile.dart';
 
 class WorkerHistoryScreen extends ConsumerWidget {
@@ -14,7 +15,10 @@ class WorkerHistoryScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final history = ref.watch(workerHistoryProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('My Project History')),
+      appBar: AppBar(
+        title: const Text('My Project History'),
+        actions: const [RefreshDataButton()],
+      ),
       body: history.when(
         loading: () => const LoadingSkeletonList(itemCount: 6),
         error: (e, _) => Center(child: Text('Error: $e')),

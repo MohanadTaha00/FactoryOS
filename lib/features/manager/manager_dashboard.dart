@@ -59,8 +59,7 @@ class _ManagerHome extends ConsumerWidget {
 
     return RefreshIndicator(
       onRefresh: () async {
-        ref.invalidate(allWorkOrdersProvider);
-        ref.invalidate(lowStockProvider);
+        await refreshAppData(ref);
         await ref.read(allWorkOrdersProvider.future);
       },
       child: ordersAsync.when(

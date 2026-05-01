@@ -132,3 +132,22 @@ final notificationsProvider =
       .watch(notificationsRepositoryProvider)
       .watchFor(session.user.id);
 });
+
+/// Refetch profile, work orders, inventory, and notifications while staying
+/// signed in. Flushes the offline mutation queue first when online.
+Future<void> refreshAppData(WidgetRef ref) async {
+  await ref.read(syncRepositoryProvider).drainQueue();
+  ref.invalidate(currentProfileProvider);
+  ref.invalidate(allWorkOrdersProvider);
+  ref.invalidate(myWorkOrdersProvider);
+  ref.invalidate(workerHistoryProvider);
+  ref.invalidate(qaQueueProvider);
+  ref.invalidate(qaHistoryProvider);
+  ref.invalidate(inventoryProvider);
+  ref.invalidate(lowStockProvider);
+  ref.invalidate(notificationsProvider);
+  for (final role in UserRole.values) {
+    ref.invalidate(usersByRoleProvider(role));
+  }
+  ref.invalidate(workOrderByIdProvider);
+}

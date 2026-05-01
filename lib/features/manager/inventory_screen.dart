@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import '../../data/models/inventory_item.dart';
 import '../../state/providers.dart';
 import '../shared/widgets/empty_state.dart';
+import '../shared/widgets/refresh_data_button.dart';
 import '../shared/widgets/loading_skeleton.dart';
 
 class InventoryScreen extends ConsumerStatefulWidget {
@@ -24,12 +25,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Inventory'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => ref.invalidate(inventoryProvider),
-          ),
-        ],
+        actions: const [RefreshDataButton()],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _editItem(null),

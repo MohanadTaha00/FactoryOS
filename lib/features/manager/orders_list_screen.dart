@@ -6,6 +6,7 @@ import '../../data/models/enums.dart';
 import '../../state/providers.dart';
 import '../shared/widgets/empty_state.dart';
 import '../shared/widgets/loading_skeleton.dart';
+import '../shared/widgets/refresh_data_button.dart';
 import '../shared/widgets/work_order_tile.dart';
 
 class OrdersListScreen extends ConsumerStatefulWidget {
@@ -25,12 +26,7 @@ class _OrdersListScreenState extends ConsumerState<OrdersListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Work orders'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => ref.invalidate(allWorkOrdersProvider),
-          ),
-        ],
+        actions: const [RefreshDataButton()],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/manager/orders/new'),

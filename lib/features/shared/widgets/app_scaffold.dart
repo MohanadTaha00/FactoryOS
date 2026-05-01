@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../data/models/enums.dart';
 import '../../../state/providers.dart';
 import 'connection_indicator.dart';
+import 'refresh_data_button.dart';
 import 'role_badge.dart';
 
 /// Common app shell: side rail on wide screens, drawer on narrow,
@@ -67,6 +68,7 @@ class AppScaffold extends ConsumerWidget {
               ],
             ),
             actions: [
+              const RefreshDataButton(),
               IconButton(
                 icon: Badge(
                   isLabelVisible: unread > 0,

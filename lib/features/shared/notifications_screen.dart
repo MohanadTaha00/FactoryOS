@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../core/routing/notification_route.dart';
 import '../../state/providers.dart';
 import 'widgets/empty_state.dart';
+import 'widgets/refresh_data_button.dart';
 import 'widgets/loading_skeleton.dart';
 
 class NotificationsScreen extends ConsumerWidget {
@@ -22,6 +23,7 @@ class NotificationsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Notifications'),
         actions: [
+          const RefreshDataButton(),
           if (session != null)
             TextButton.icon(
               onPressed: () async {
