@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/enums.dart';
 import '../../state/providers.dart';
+import '../shared/widgets/work_order_pdf_attachment.dart';
 
 class QaReviewScreen extends ConsumerStatefulWidget {
   const QaReviewScreen({super.key, required this.orderId});
@@ -48,7 +49,7 @@ class _QaReviewScreenState extends ConsumerState<QaReviewScreen> {
             content: Text(
               result == QaResult.pass
                   ? 'Task approved successfully'
-                  : 'Task rejected and returned for revision',
+                  : 'Revision sent to worker',
             ),
           ),
         );
@@ -75,6 +76,10 @@ class _QaReviewScreenState extends ConsumerState<QaReviewScreen> {
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (o) {
           if (o == null) return const Center(child: Text('Order not found'));
+          final readOnly =
+              o.status == WorkOrderStatus.approved ||
+              o.status == WorkOrderStatus.completed ||
+              o.status == WorkOrderStatus.cancelled;
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
@@ -108,34 +113,55 @@ class _QaReviewScreenState extends ConsumerState<QaReviewScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              TextField(
-                controller: _notes,
-                maxLines: 5,
-                decoration: const InputDecoration(
-                  labelText: 'QA notes',
-                  hintText: 'Inspection notes, defects, revisions...',
+              if (o.attachmentUrl != null &&
+                  o.attachmentUrl!.trim().isNotEmpty) ...[
+                WorkOrderPdfAttachment(url: o.attachmentUrl!),
+                const SizedBox(height: 16),
+              ],
+              if (readOnly)
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      'This order is closed (${o.status.label}). '
+                      'You can still view notes and attachments.',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                )
+              else ...[
+                TextField(
+                  controller: _notes,
+                  maxLines: 5,
+                  decoration: const InputDecoration(
+                    labelText: 'QA notes',
+                    hintText:
+                        'Inspection notes, defects, revisions sent to worker…',
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _busy ? null : () => _submit(QaResult.fail),
-                      icon: const Icon(Icons.close),
-                      label: const Text('Reject'),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _busy ? null : () => _submit(QaResult.fail),
+                        icon: const Icon(Icons.close),
+                        label: const Text('Reject'),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: FilledButton.icon(
-                      onPressed: _busy ? null : () => _submit(QaResult.pass),
-                      icon: const Icon(Icons.check),
-                      label: const Text('Approve'),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: _busy ? null : () => _submit(QaResult.pass),
+                        icon: const Icon(Icons.check),
+                        label: const Text('Approve'),
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+              ],
             ],
           );
         },

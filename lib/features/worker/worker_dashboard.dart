@@ -105,7 +105,7 @@ class WorkerDashboard extends ConsumerWidget {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(
-                                  'Order Revision: ${o.latestRevisionNotes ?? 'QA requested revisions.'}',
+                                  'Revision sent to worker — ${o.latestRevisionNotes ?? 'See QA notes in task details.'}',
                                   style: TextStyle(
                                     color: Theme.of(
                                       context,

@@ -51,6 +51,22 @@ flutter run -d android \
   --dart-define=SUPABASE_ANON_KEY=YOUR_ANON_KEY
 ```
 
+### Windows desktop “missing DLL” error
+
+Do **not** run only `factoryos.exe` by itself from an empty folder. Flutter bundles plugins as separate DLLs next to the exe (`app_links_plugin.dll`, `connectivity_plus_plugin.dll`, etc.) plus a `data/` directory.
+
+After `flutter build windows --release`, run the exe **from**:
+
+`build/windows/x64/runner/Release/`
+
+Or package everything into `release/Windows/`:
+
+```powershell
+.\scripts\package_windows_release.ps1
+```
+
+Then start `release\Windows\factoryos.exe`.
+
 ## 3) Build generated code
 
 ```bash

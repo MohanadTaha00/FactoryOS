@@ -21,6 +21,8 @@ dependencies:
   # Routing
   go_router: ^17.2.2
 
+  url_launcher: ^6.3.2
+
   # Local persistence (offline cache)
   drift: ^2.32.1
   drift_flutter: ^0.3.0

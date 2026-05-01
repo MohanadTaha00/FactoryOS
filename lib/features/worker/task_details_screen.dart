@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/enums.dart';
 import '../../state/providers.dart';
 import '../shared/widgets/status_chip.dart';
+import '../shared/widgets/work_order_pdf_attachment.dart';
 
 class TaskDetailsScreen extends ConsumerStatefulWidget {
   const TaskDetailsScreen({super.key, required this.orderId});
@@ -163,7 +164,7 @@ class _TaskDetailsScreenState extends ConsumerState<TaskDetailsScreen> {
                     if (o.status == WorkOrderStatus.rejected)
                       const Chip(
                         avatar: Icon(Icons.build_circle_outlined, size: 18),
-                        label: Text('Order Revision'),
+                        label: Text('Revision'),
                       )
                     else
                       StatusChip(status: o.status),
@@ -171,6 +172,11 @@ class _TaskDetailsScreenState extends ConsumerState<TaskDetailsScreen> {
                 ),
               ),
               const SizedBox(height: 12),
+              if (o.attachmentUrl != null && o.attachmentUrl!.trim().isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: WorkOrderPdfAttachment(url: o.attachmentUrl!),
+                ),
               if (o.status == WorkOrderStatus.rejected) ...[
                 Container(
                   width: double.infinity,
@@ -183,7 +189,7 @@ class _TaskDetailsScreenState extends ConsumerState<TaskDetailsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Order Revision',
+                        'Revision sent to worker',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onErrorContainer,
                           fontWeight: FontWeight.w700,
