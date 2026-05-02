@@ -33,6 +33,11 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
+  <!-- Compile-time defines override these. Optional local overrides (gitignored): sync script writes supabase-runtime-config.local.js -->
+  <script>
+    window.factoryosSupabase = window.factoryosSupabase || { url: '', anonKey: '' };
+  </script>
+  <script src="supabase-runtime-config.local.js"></script>
   <!--
     You can customize the "flutter_bootstrap.js" script.
     This is useful to provide a custom configuration to the Flutter loader

@@ -21,15 +21,33 @@ class UsersRepository {
     if (role != UserRole.worker && role != UserRole.qa) {
       throw StateError('Managers can only create worker or QA accounts.');
     }
-    await _c.functions.invoke(
-      'manager-create-user',
-      body: {
-        'full_name': fullName.trim(),
-        'email': email.trim().toLowerCase(),
-        'password': password,
-        'role': role.wire,
-      },
-    );
+    try {
+      await _c.functions.invoke(
+        'manager-create-user',
+        body: {
+          'full_name': fullName.trim(),
+          'email': email.trim().toLowerCase(),
+          'password': password,
+          'role': role.wire,
+        },
+      );
+    } on FunctionException catch (e) {
+      throw Exception(_managerCreateUserMessage(e));
+    }
+  }
+
+  static String _managerCreateUserMessage(FunctionException e) {
+    final details = e.details;
+    if (details is Map && details['error'] is String) {
+      return details['error'] as String;
+    }
+    if (details is String && details.trim().isNotEmpty) {
+      return details.trim();
+    }
+    if (e.status == 404) {
+      return 'Account service not found (404). Deploy Edge Function manager-create-user for this project.';
+    }
+    return 'Account service error (HTTP ${e.status}). Check Supabase Functions logs for manager-create-user.';
   }
 
   Future<List<UserAttributes>> fetchByRole(UserRole role) async {

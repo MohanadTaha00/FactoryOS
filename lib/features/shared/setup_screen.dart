@@ -30,9 +30,8 @@ class SetupScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'FactoryOS connects to a Supabase backend. Pass the URL '
-                      'and anon key as --dart-define values when launching the '
-                      'app.',
+                      'FactoryOS connects to Supabase. Use either compile-time '
+                      'defines or (web only) web/supabase-runtime-config.js.',
                       style: TextStyle(color: cs.onSurfaceVariant),
                     ),
                     const SizedBox(height: 24),
@@ -45,7 +44,10 @@ class SetupScreen extends StatelessWidget {
                       child: const SelectableText(
                         'flutter run \\\n'
                         '  --dart-define=SUPABASE_URL=https://xxx.supabase.co \\\n'
-                        '  --dart-define=SUPABASE_ANON_KEY=eyJ...',
+                        '  --dart-define=SUPABASE_ANON_KEY=eyJ...\n\n'
+                        'Web deploy: scripts/sync_web_supabase_config.ps1 '
+                        '(writes web/supabase-runtime-config.local.js), '
+                        'then flutter build web.',
                         style: TextStyle(fontFamily: 'monospace', fontSize: 12),
                       ),
                     ),

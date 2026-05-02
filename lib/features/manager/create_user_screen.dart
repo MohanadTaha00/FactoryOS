@@ -61,7 +61,10 @@ class _CreateUserScreenState extends ConsumerState<CreateUserScreen> {
 
   String _friendlyError(Object e) {
     final raw = e.toString();
-    final msg = raw.toLowerCase();
+    final stripped = raw.startsWith('Exception: ')
+        ? raw.substring('Exception: '.length)
+        : raw;
+    final msg = stripped.toLowerCase();
     if (msg.contains('user already registered') || msg.contains('already exists')) {
       return 'This email is already registered.';
     }
@@ -71,10 +74,22 @@ class _CreateUserScreenState extends ConsumerState<CreateUserScreen> {
     if (msg.contains('password')) {
       return 'Password must meet Supabase requirements (minimum 6 characters).';
     }
-    if (msg.contains('functions')) {
-      return 'Account service unavailable. Deploy Supabase function: manager-create-user.';
+    if (msg.contains('not found (404)') || msg.contains('deploy edge function')) {
+      return stripped;
     }
-    return 'Failed to create account: $raw';
+    if (msg.contains('user not allowed')) {
+      return 'The provisioning service is using the wrong Supabase API key. '
+          'Open Supabase Dashboard → Project Settings → API and set Edge Function '
+          'secret FACTORYOS_SUPABASE_SERVICE_ROLE_KEY to the service_role key '
+          '(not the anon key), then redeploy manager-create-user.';
+    }
+    if (msg.contains('server misconfiguration')) {
+      return stripped;
+    }
+    if (msg.contains('account service error')) {
+      return stripped;
+    }
+    return 'Failed to create account: $stripped';
   }
 
   @override

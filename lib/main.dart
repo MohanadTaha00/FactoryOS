@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app.dart';
+import 'core/config/env.dart';
 import 'data/supabase/supabase_service.dart';
 import 'features/shared/notifications/notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Env.loadPlatformRuntime();
   await SupabaseService.initialize();
 
   String? notificationLaunchRoute;
