@@ -1,2 +1,2 @@
-# Bash must use LF so `bash scripts/vercel_build.sh` works on Vercel (Linux).
+# Shell scripts must use LF so `sh scripts/vercel_build.sh` works on Vercel (Linux).
 *.sh text eol=lf
