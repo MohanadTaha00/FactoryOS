@@ -1,22 +1,24 @@
 import 'env_platform_stub.dart'
+    if (dart.library.io) 'env_platform_io.dart'
     if (dart.library.js_interop) 'env_platform_web.dart';
 
 /// Environment configuration.
 ///
 /// **Compile-time** (any platform): `--dart-define` / `--dart-define-from-file`.
 ///
-/// **Web runtime**: before running Flutter, load `supabase-runtime-config.js`
-/// from `web/` (sets `window.factoryosSupabase`). Run
-/// `scripts/sync_web_supabase_config.ps1` to generate it from `.env`.
+/// **Desktop / mobile (IO)** at runtime: `.env` next to the executable, cwd,
+/// app support/documents (Android/iOS), or `FACTORYOS_ENV_FILE`.
+///
+/// **Web runtime**: `web/supabase-runtime-config.local.js` / `window.factoryosSupabase`.
 class Env {
   Env._();
 
   static String _runtimeUrl = '';
   static String _runtimeAnonKey = '';
 
-  /// Applies platform-specific overrides (e.g. web `window.factoryosSupabase`).
-  static void loadPlatformRuntime() {
-    registerPlatformEnv((url, anon) {
+  /// Applies platform-specific overrides (web globals, IO `.env` files).
+  static Future<void> loadPlatformRuntime() async {
+    await loadPlatformEnv((url, anon) {
       _runtimeUrl = url;
       _runtimeAnonKey = anon;
     });

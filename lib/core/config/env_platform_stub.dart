@@ -1,1 +1,1 @@
-void registerPlatformEnv(void Function(String url, String anonKey) apply) {}
+Future<void> loadPlatformEnv(void Function(String url, String anonKey) apply) async {}

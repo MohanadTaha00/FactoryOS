@@ -9,7 +9,7 @@ extension type _FactoryOSSupabase(JSObject _) implements JSObject {
 @JS('factoryosSupabase')
 external _FactoryOSSupabase? get _factoryosSupabase;
 
-void registerPlatformEnv(void Function(String url, String anonKey) apply) {
+Future<void> loadPlatformEnv(void Function(String url, String anonKey) apply) async {
   try {
     final cfg = _factoryosSupabase;
     if (cfg == null) return;

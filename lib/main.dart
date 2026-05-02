@@ -9,7 +9,7 @@ import 'features/shared/notifications/notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Env.loadPlatformRuntime();
+  await Env.loadPlatformRuntime();
   await SupabaseService.initialize();
 
   String? notificationLaunchRoute;

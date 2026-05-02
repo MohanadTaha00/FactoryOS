@@ -30,8 +30,9 @@ class SetupScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'FactoryOS connects to Supabase. Use either compile-time '
-                      'defines or (web only) web/supabase-runtime-config.js.',
+                      'FactoryOS needs SUPABASE_URL and SUPABASE_ANON_KEY — '
+                      'via --dart-define, a .env file in supported locations, '
+                      'or (web only) supabase-runtime-config.local.js.',
                       style: TextStyle(color: cs.onSurfaceVariant),
                     ),
                     const SizedBox(height: 24),
@@ -42,12 +43,15 @@ class SetupScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const SelectableText(
+                        'Easiest Android (uses repo .env):\n'
+                        'scripts/run_android_with_env.ps1\n\n'
+                        'Or Device File Explorer → data/data/'
+                        'com.altinbas.factoryos.factoryos/files/.env\n'
+                        'iOS/Desktop: app support/documents or .exe folder.\n\n'
                         'flutter run \\\n'
                         '  --dart-define=SUPABASE_URL=https://xxx.supabase.co \\\n'
                         '  --dart-define=SUPABASE_ANON_KEY=eyJ...\n\n'
-                        'Web deploy: scripts/sync_web_supabase_config.ps1 '
-                        '(writes web/supabase-runtime-config.local.js), '
-                        'then flutter build web.',
+                        'Web: scripts/sync_web_supabase_config.ps1 then flutter build web.',
                         style: TextStyle(fontFamily: 'monospace', fontSize: 12),
                       ),
                     ),
