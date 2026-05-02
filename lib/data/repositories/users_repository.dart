@@ -39,7 +39,12 @@ class UsersRepository {
   static String _managerCreateUserMessage(FunctionException e) {
     final details = e.details;
     if (details is Map && details['error'] is String) {
-      return details['error'] as String;
+      final msg = details['error'] as String;
+      final detail = details['detail'];
+      if (detail is String && detail.trim().isNotEmpty) {
+        return '${msg.trim()} — ${detail.trim()}';
+      }
+      return msg;
     }
     if (details is String && details.trim().isNotEmpty) {
       return details.trim();

@@ -50,6 +50,20 @@ function pickKey(
   return undefined;
 }
 
+/** Prefer JWT `role` claim; otherwise first non-empty candidate (non-JWT / newer Supabase keys). */
+function pickWithJwtRoleOrRaw(
+  role: "anon" | "service_role",
+  ...candidates: (string | undefined)[]
+): string | undefined {
+  const matched = pickKey(role, ...candidates);
+  if (matched) return matched;
+  for (const c of candidates) {
+    const t = c?.trim();
+    if (t) return t;
+  }
+  return undefined;
+}
+
 function resolveSupabaseConfig():
   | { ok: true; url: string; anonKey: string; serviceRole: string }
   | { ok: false; message: string } {
@@ -58,14 +72,14 @@ function resolveSupabaseConfig():
   const publishableRaw = trimEnv("SUPABASE_PUBLISHABLE_KEYS");
   const secretRaw = trimEnv("SUPABASE_SECRET_KEYS");
 
-  const anonKey = pickKey(
+  const anonKey = pickWithJwtRoleOrRaw(
     "anon",
     trimEnv("FACTORYOS_SUPABASE_ANON_KEY"),
     trimEnv("SUPABASE_ANON_KEY"),
     parseJsonDefault(publishableRaw),
   );
 
-  const serviceRole = pickKey(
+  const serviceRole = pickWithJwtRoleOrRaw(
     "service_role",
     trimEnv("FACTORYOS_SUPABASE_SERVICE_ROLE_KEY"),
     trimEnv("SUPABASE_SERVICE_ROLE_KEY"),
@@ -128,7 +142,10 @@ Deno.serve(async (req) => {
     const cfg = resolveSupabaseConfig();
     if (!cfg.ok) {
       console.error("manager-create-user config:", cfg.message);
-      return json(req, { error: "Server misconfiguration (Supabase keys)." }, 500);
+      return json(req, {
+        error: "Server misconfiguration (Supabase keys).",
+        detail: cfg.message,
+      }, 500);
     }
 
     const { url: supabaseUrl, anonKey, serviceRole } = cfg;
