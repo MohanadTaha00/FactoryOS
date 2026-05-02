@@ -33,6 +33,41 @@ From the repo root, open and run SQL files in this order:
 
 Detailed notes: `supabase/README.md`.
 
+### Manager-created user accounts (worker/QA)
+
+To let manager/admin create worker/QA accounts from the dashboard, deploy the
+Edge Function in this repo:
+
+```bash
+npx supabase functions deploy manager-create-user --project-ref YOUR_PROJECT_REF
+```
+
+Then set Edge Function secrets (Supabase CLI **rejects** names starting with
+`SUPABASE_`, so this repo uses these keys):
+
+- `FACTORYOS_SUPABASE_URL` — project URL (`https://<ref>.supabase.co`)
+- `FACTORYOS_SUPABASE_ANON_KEY` — anon public key
+- `FACTORYOS_SUPABASE_SERVICE_ROLE_KEY` — **service role** (Dashboard → Settings → API)
+
+Example (PowerShell; replace values):
+
+```powershell
+npx supabase secrets set `
+  FACTORYOS_SUPABASE_URL=https://YOUR_REF.supabase.co `
+  FACTORYOS_SUPABASE_ANON_KEY=YOUR_ANON_KEY `
+  FACTORYOS_SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY `
+  --project-ref YOUR_REF
+```
+
+Redeploy the function after changing secret names:
+
+```bash
+npx supabase functions deploy manager-create-user --project-ref YOUR_PROJECT_REF
+```
+
+This function enforces manager/admin access and uses the service role only on
+the server side (never in the Flutter app).
+
 ## 2) Run app with credentials
 
 Use Supabase URL + anon key as dart-defines:

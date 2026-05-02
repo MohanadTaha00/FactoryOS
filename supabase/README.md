@@ -27,3 +27,27 @@ In **Project Settings → API** copy:
 - `anon public` key → `SUPABASE_ANON_KEY`
 
 Pass them to the Flutter app as dart-defines (see the root `README.md`).
+
+## Edge Function: manager-create-user
+
+FactoryOS includes `supabase/functions/manager-create-user/index.ts` to let a
+manager/admin create worker or QA accounts from the app without exposing the
+service role key to clients.
+
+Deploy:
+
+```bash
+npx supabase functions deploy manager-create-user --project-ref YOUR_PROJECT_REF
+```
+
+Set function secrets (CLI forbids names starting with `SUPABASE_`):
+
+- `FACTORYOS_SUPABASE_URL`
+- `FACTORYOS_SUPABASE_ANON_KEY`
+- `FACTORYOS_SUPABASE_SERVICE_ROLE_KEY`
+
+Example:
+
+```powershell
+npx supabase secrets set FACTORYOS_SUPABASE_URL=https://YOUR_REF.supabase.co FACTORYOS_SUPABASE_ANON_KEY=YOUR_ANON FACTORYOS_SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE --project-ref YOUR_REF
+```
