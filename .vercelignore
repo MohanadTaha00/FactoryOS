@@ -1,0 +1,17 @@
+# Keeps `vercel deploy` from the repo root small (avoid ~1GB uploads).
+# Prefer `flutter build web` then `vercel deploy build/web`, or rely on GitHub → Vercel.
+.git/
+.dart_tool/
+.idea/
+**/doc/api/
+android/
+ios/
+linux/
+macos/
+windows/
+build/
+coverage/
+supabase/.temp/
+.agents/
+*.apk
+*.ipa
