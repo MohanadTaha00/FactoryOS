@@ -36,6 +36,10 @@ class AppRouter {
     redirect: _redirect,
     routes: [
       GoRoute(
+        path: '/',
+        redirect: (context, state) => '/login',
+      ),
+      GoRoute(
         path: '/setup',
         pageBuilder: (context, state) =>
             _page(state, const SetupScreen(), fadeOnly: true),
