@@ -6,6 +6,7 @@ import '../../data/models/enums.dart';
 import '../../features/auth/login_screen.dart';
 import '../../features/auth/signup_screen.dart';
 import '../../features/manager/create_order_screen.dart';
+import '../../features/manager/create_user_screen.dart';
 import '../../features/manager/inventory_screen.dart';
 import '../../features/manager/manager_dashboard.dart';
 import '../../features/manager/order_details_screen.dart';
@@ -68,6 +69,11 @@ class AppRouter {
             path: 'orders/new',
             pageBuilder: (context, state) =>
                 _page(state, const CreateOrderScreen()),
+          ),
+          GoRoute(
+            path: 'users/new',
+            pageBuilder: (context, state) =>
+                _page(state, const CreateUserScreen()),
           ),
           GoRoute(
             path: 'orders/:id',

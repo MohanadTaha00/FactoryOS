@@ -118,6 +118,13 @@ class _ManagerHome extends ConsumerWidget {
                       onPressed: reloadOverview,
                       icon: const Icon(Icons.refresh),
                     ),
+                    const SizedBox(width: 4),
+                    FilledButton.tonalIcon(
+                      onPressed: () => context.push('/manager/users/new'),
+                      icon: const Icon(Icons.person_add_alt_1),
+                      label: const Text('Account'),
+                    ),
+                    const SizedBox(width: 8),
                     FilledButton.tonalIcon(
                       onPressed: () => context.push('/manager/orders/new'),
                       icon: const Icon(Icons.add),
