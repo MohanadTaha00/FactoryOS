@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "installCommand": "echo skip",
-  "buildCommand": "sh scripts/vercel_build.sh",
+  "buildCommand": "node scripts/vercel_build.mjs",
   "outputDirectory": "build/web",
   "rewrites": [
     {
